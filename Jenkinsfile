@@ -2,23 +2,29 @@ pipeline {
     agent any
 
     stages {
-        stage('Pull Code') {
+
+        stage('Clone') {
             steps {
-                git 'https://github.com/gohilheena456-cloud/flask-app.git'
+                git branch: 'main', url: 'https://github.com/gohilheena456-cloud/flask-app.git'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                sh 'pip3 install -r requirements.txt'
+                sh '''
+                python3 -m venv venv
+                . venv/bin/activate
+                pip install -r requirements.txt
+                '''
             }
         }
 
-        stage('Restart Application') {
+        stage('Start/Restart App') {
             steps {
-                sh 'pm2 restart flask-app || pm2 start app.py --name flask-app --interpreter python3'
+                sh '''
+                pm2 restart flask-app || pm2 start app.py --name flask-app --interpreter python3
+                '''
             }
         }
     }
 }
-
